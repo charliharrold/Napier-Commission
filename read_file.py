@@ -1,11 +1,20 @@
 import PyPDF2
+import re
 import nltk
 from nltk.corpus import words
-import re
+from nltk.stem import WordNetLemmatizer
+nltk.download('words')
+nltk.download('wordnet')
+nltk.download('omw-1.4')
 
 nltk.download('words')
 
 english_vocab = set(words.words())
+lemmatizer = WordNetLemmatizer()
+
+def is_valid_word(word):
+    base = lemmatizer.lemmatize(word.lower())
+    return base in english_vocab
 
 common_replacements = {"laudlord": "landlord", "chairynan": "Chairman"}
 
@@ -24,12 +33,6 @@ def read_file():
                     outfile.writelines(text) #write page to file and repeat  
     return
 
-import nltk
-from nltk.corpus import words
-nltk.download('words')
-
-english_vocab = set(words.words())
-
 def manual_clean(input_path, output_path):
     with open(input_path, "r", encoding="utf-8") as infile:
         raw_text = infile.read()
@@ -43,24 +46,29 @@ def manual_clean(input_path, output_path):
 
         for word in line_words:
             stripped = word.strip("—.,!?;:\"()[]{}").lower()
-            if "?—" in stripped:
+            if stripped in common_replacements:
+                fixed = word.replace(stripped, common_replacements[stripped])
+                new_line.append(fixed)
+            elif "?—" in stripped:
+                fixed = ""
                 split_words = word.split("?—")
                 for i in range(len(split_words)):
                     original_words = split_words[:]
                     split_words[i] = split_words[i].lower()
                     
                     if split_words[i] in english_vocab:
-                        new_line.append(original_words[i])
+                        fixed += original_words[i]
                     else:
                         print(f"\nUnrecognized word: '{split_words[i]}'")
                         print(f"Line: {line}")
                         correction = input("Enter correction (or press Enter to keep as-is): ")
-                        new_line.append(correction if correction else original_words[i])
+                        fixed += (correction if correction else original_words[i])
                         
                     if i != len(split_words) - 1:
-                        new_line.append("?—")
-                    
-            elif stripped in english_vocab or stripped == "":
+                        fixed += "?—"
+                        
+                new_line.append(fixed)
+            elif is_valid_word(stripped) or stripped == "" or re.search(r"[0-9]+\.", word) != None:
                 new_line.append(word)
             else:  
                 print(f"\nUnrecognized word: '{word}'")
@@ -68,7 +76,7 @@ def manual_clean(input_path, output_path):
                 correction = input("Enter correction (or press Enter to keep as-is): ")
                 new_line.append(correction if correction else word)
 
-        cleaned_words.append(" ".join(new_line)) #don't always want space between (e.g. spacing of ?—)
+        cleaned_words.append(" ".join(new_line))
 
     with open(output_path, "w", encoding="utf-8") as outfile:
         outfile.write("\n".join(cleaned_words))
