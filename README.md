@@ -2,7 +2,7 @@ Napier Commission
 
 Context
 - The Napier Commission (Royal Commission of Inquiry into the Condition of Crofters and Cottars in the Highlands and Islands) was a inquiry into the condition of crofters and cottars in the Highlands and Islands of Scotland in the 1880s. 
-- The commission was a response to crofter and cottar agitation in the Scottish Highlands due to high rents, lach of security of tenure, and removal of land.
+- The commission was a response to crofter and cottar agitation in the Scottish Highlands due to high rents, lack of security of tenure, and removal of land.
 - Interesting because you get to hear from the people themselves.
 
 Goal and Scope
@@ -11,3 +11,4 @@ Goal and Scope
 - I will create a website that allows people to:
     -> filter by location manually and using a map
     -> create different types of graphs to analyze the Napier Commission (word usage, sentiment analysis)
+- I will personally use this functionality to analyze the Napier Commission thinking about women, and the lack of the perspectives of women in the Napier Commission.
